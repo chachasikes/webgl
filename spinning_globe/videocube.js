@@ -34,10 +34,10 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.x = 0;
 	camera.position.y = 0;
-	camera.position.z = 500;
+	camera.position.z = 600;
 	scene.add( camera );
 
 	// Cube, which plays a video (open format video files only - not sure if vimeo will be possible)
@@ -56,7 +56,7 @@ function init() {
 	videoTexture.format = THREE.RGBFormat;  
 
   image = document.createElement( 'canvas' );
-	image.width = 637;
+	image.width = 630;
 	image.height = 264;
 	
 	imageContext = image.getContext( '2d' );
@@ -67,7 +67,7 @@ function init() {
 	texture.minFilter = THREE.LinearFilter;
 	texture.magFilter = THREE.LinearFilter;
 
-  var parameters = { color: 0x000000, map: texture, overdraw: true },
+  var parameters = { color: 0xffffff, map: texture,  overdraw: true},
 	material_base = new THREE.MeshBasicMaterial( parameters );
   material = new THREE.MeshBasicMaterial(parameters);
 
@@ -75,36 +75,14 @@ function init() {
 		materials.push( material );   
 	}
 
-	surface = new THREE.Mesh( new THREE.CubeGeometry( 637, 264, 637, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+  // radius <Number>, segmentsWidth <Number>, segmentsHeight <Number>
+	surface = new THREE.Mesh( new THREE.SphereGeometry( 300, 50, 50 ), material);
 	scene.add( surface );
-
-//( radiusTop <Number>, radiusBottom <Number>, height <Number>, segmentsRadius <Number>, segmentsHeight <Number>, openEnded <Boolean> )
-
-/*
-  surface = new THREE.Mesh( new THREE.CylinderGeometry(), new THREE.MeshFaceMaterial() );
-	scene.add( surface );
-	
-*/
-	
-
-	// Plane
-	plane = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ), new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
-	plane.rotation.x = - 90 * ( Math.PI / 180 );
-	plane.position.y = -100;
-	scene.add( plane );
 
 	renderer = new THREE.CanvasRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 
 	container.appendChild( renderer.domElement );
-
-/*
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	container.appendChild( stats.domElement );
-*/
-
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 	document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 	document.addEventListener( 'touchmove', onDocumentTouchMove, false );
@@ -172,25 +150,20 @@ function onDocumentTouchMove( event ) {
 //
 
 function animate() {
-
 	requestAnimationFrame( animate );
-
 	render();
-	stats.update();
-
 }
 
 function render() {
+	surface.rotation.x += ( targetRotation - surface.rotation.x ) * 0.05;
+	surface.rotation.y += ( targetRotation - surface.rotation.x ) * 0.05;
 
-	plane.rotation.z = surface.rotation.y += ( targetRotation - surface.rotation.y ) * 0.05;
 	renderer.render( scene, camera );
 
   if( video.readyState === video.HAVE_ENOUGH_DATA ){
       if (texture) texture.needsUpdate = true;
       imageContext.drawImage( video, 0, 0 );
-
   }
-
 }
 
 
