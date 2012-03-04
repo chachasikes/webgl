@@ -29,7 +29,7 @@ function init() {
 	info.style.top = '10px';
 	info.style.width = '100%';
 	info.style.textAlign = 'center';
-	info.innerHTML = 'Drag to spin the video';
+	info.innerHTML = 'Drag to spin the video <a href="https://github.com/chachasikes/webgl">github</a>';
 	container.appendChild( info );
 
 	scene = new THREE.Scene();
@@ -181,8 +181,7 @@ function animate() {
 }
 
 function render() {
-
-	plane.rotation.z = surface.rotation.y += ( targetRotation - surface.rotation.y ) * 0.05;
+	surface.rotation.y += ( targetRotation - surface.rotation.y ) * 0.05;
 	renderer.render( scene, camera );
 
   if( video.readyState === video.HAVE_ENOUGH_DATA ){
@@ -190,7 +189,6 @@ function render() {
       imageContext.drawImage( video, 0, 0 );
 
   }
-
 }
 
 

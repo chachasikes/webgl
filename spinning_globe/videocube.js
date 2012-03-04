@@ -29,7 +29,7 @@ function init() {
 	info.style.top = '10px';
 	info.style.width = '100%';
 	info.style.textAlign = 'center';
-	info.innerHTML = 'Drag to spin the video';
+	info.innerHTML = 'Drag to spin the video <a href="https://github.com/chachasikes/webgl">github</a>';
 	container.appendChild( info );
 
 	scene = new THREE.Scene();
