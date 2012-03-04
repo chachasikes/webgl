@@ -1,209 +1,187 @@
+var container, stats;
+var camera, scene, renderer;
+var cube, plane;
 
+var targetRotation = 0;
+var targetRotationOnMouseDown = 0;
 
-			var container, stats;
+var mouseX = 0;
+var mouseXOnMouseDown = 0;
 
-			var camera, scene, renderer;
+var windowHalfX = window.innerWidth / 2;
+var windowHalfY = window.innerHeight / 2;
+var video;
 
-			var cube, plane;
+var videoTexture;
+var material;
+var imageContext;
 
-			var targetRotation = 0;
-			var targetRotationOnMouseDown = 0;
+init();
+animate();
 
-			var mouseX = 0;
-			var mouseXOnMouseDown = 0;
+function init() {
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-      var video;
+	container = document.createElement( 'div' );
+	document.body.appendChild( container );
 
-      var videoTexture;
-      var material;
-      var imageContext;
+	var info = document.createElement( 'div' );
+	info.style.position = 'absolute';
+	info.style.top = '10px';
+	info.style.width = '100%';
+	info.style.textAlign = 'center';
+	info.innerHTML = 'Drag to spin the video';
+	container.appendChild( info );
 
-			init();
-			animate();
+	scene = new THREE.Scene();
 
-			function init() {
+	camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.x = 0;
+	camera.position.y = 0;
+	camera.position.z = 500;
+	scene.add( camera );
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+	// Cube, which plays a video (open format video files only - not sure if vimeo will be possible)
+	
+	var materials = [];
+  video = document.createElement('video');
+  
+  video.width = 637;
+  video.height = 264;
+  video.autoplay = true;
+  video.src = "http://video-js.zencoder.com/oceans-clip.mp4";
+  
+  videoTexture = new THREE.Texture( video );
+  videoTexture.minFilter = THREE.LinearFilter;
+  videoTexture.magFilter = THREE.LinearFilter;
+	videoTexture.format = THREE.RGBFormat;  
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin the cube';
-				container.appendChild( info );
+  image = document.createElement( 'canvas' );
+	image.width = 637;
+	image.height = 264;
+	
+	imageContext = image.getContext( '2d' );
+	imageContext.fillStyle = '#000000';
+	imageContext.fillRect( 0, 0, 637, 264 );
+	
+	texture = new THREE.Texture( image );
+	texture.minFilter = THREE.LinearFilter;
+	texture.magFilter = THREE.LinearFilter;
 
+  var parameters = { color: 0x000000, map: texture, overdraw: true },
+	material_base = new THREE.MeshBasicMaterial( parameters );
+  material = new THREE.MeshBasicMaterial(parameters);
 
+	for ( var i = 0; i < 6; i ++ ) {
+		materials.push( material );   
+	}
 
-				scene = new THREE.Scene();
+	cube = new THREE.Mesh( new THREE.CubeGeometry( 637, 264, 637, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+	scene.add( cube );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.x = 150;
-				camera.position.y = 150;
-				camera.position.z = 400;
-				scene.add( camera );
+	// Plane
+	plane = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+	plane.rotation.x = - 90 * ( Math.PI / 180 );
+	plane.position.y = -100;
+	scene.add( plane );
 
-				// Cube
+	renderer = new THREE.CanvasRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
 
-				var materials = [];
-        video = document.createElement('video');
-        video.width = 320;
-        video.height = 240;
-        video.autoplay = true;
-        video.src = "http://erunways.com/html5/WebM_VP8_video/html5_Video_VP8.webm";
-       // container.appendChild(video);
-        
-        videoTexture = new THREE.Texture( video );
-        videoTexture.minFilter = THREE.LinearFilter;
-			  videoTexture.magFilter = THREE.LinearFilter;
-				videoTexture.format = THREE.RGBFormat;  
+	container.appendChild( renderer.domElement );
 
-        image = document.createElement( 'canvas' );
-				image.width = 480;
-				image.height = 204;
-				
-				imageContext = image.getContext( '2d' );
-				imageContext.fillStyle = '#0ffb00';
-				imageContext.fillRect( 0, 0, 480, 204 );
-				
-				texture = new THREE.Texture( image );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-
-			  var parameters = { color: 0xffffff, map: texture },
-				material_base = new THREE.MeshBasicMaterial( parameters );
-
-
-				
-			//		var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
-
-        material = new THREE.MeshBasicMaterial(parameters);
-        //texture
-//THREE.ImageUtils.loadTexture("texture.png")
 /*
-        material = new THREE.MeshLambertMaterial({
-          map : videoTexture, 
-          color: 0xffaabb
-        });
+	stats = new Stats();
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.top = '0px';
+	container.appendChild( stats.domElement );
 */
 
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+	document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+	document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+}
 
+//
 
-				for ( var i = 0; i < 6; i ++ ) {
-					materials.push( material );   
-				}
+function onDocumentMouseDown( event ) {
 
-				cube = new THREE.Mesh( new THREE.CubeGeometry( 400, 200, 300, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
-        cube.overdraw = true;
+	event.preventDefault();
 
-				cube.position.y = 150;
-				scene.add( cube );
+	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+	document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+	document.addEventListener( 'mouseout', onDocumentMouseOut, false );
 
-				// Plane
+	mouseXOnMouseDown = event.clientX - windowHalfX;
+	targetRotationOnMouseDown = targetRotation;
+}
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
-				plane.rotation.x = - 90 * ( Math.PI / 180 );
-				scene.add( plane );
+function onDocumentMouseMove( event ) {
 
-				renderer = new THREE.CanvasRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+	mouseX = event.clientX - windowHalfX;
 
-				container.appendChild( renderer.domElement );
+	targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+}
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+function onDocumentMouseUp( event ) {
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-			}
+	document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+	document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+	document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
 
-			//
+function onDocumentMouseOut( event ) {
 
-			function onDocumentMouseDown( event ) {
+	document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+	document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+	document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
 
-				event.preventDefault();
+function onDocumentTouchStart( event ) {
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+	if ( event.touches.length == 1 ) {
 
-				mouseXOnMouseDown = event.clientX - windowHalfX;
-				targetRotationOnMouseDown = targetRotation;
-			}
+		event.preventDefault();
 
-			function onDocumentMouseMove( event ) {
+		mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
+		targetRotationOnMouseDown = targetRotation;
 
-				mouseX = event.clientX - windowHalfX;
+	}
+}
 
-				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
-			}
+function onDocumentTouchMove( event ) {
 
-			function onDocumentMouseUp( event ) {
+	if ( event.touches.length == 1 ) {
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-			}
+		event.preventDefault();
 
-			function onDocumentMouseOut( event ) {
+		mouseX = event.touches[ 0 ].pageX - windowHalfX;
+		targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-			}
+	}
+}
 
-			function onDocumentTouchStart( event ) {
+//
 
-				if ( event.touches.length == 1 ) {
+function animate() {
 
-					event.preventDefault();
+	requestAnimationFrame( animate );
 
-					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotationOnMouseDown = targetRotation;
+	render();
+	stats.update();
 
-				}
-			}
+}
 
-			function onDocumentTouchMove( event ) {
+function render() {
 
-				if ( event.touches.length == 1 ) {
+	plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
+	renderer.render( scene, camera );
 
-					event.preventDefault();
+  if( video.readyState === video.HAVE_ENOUGH_DATA ){
+      if (texture) texture.needsUpdate = true;
+      imageContext.drawImage( video, 0, 0 );
 
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
+  }
 
-				}
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
-				renderer.render( scene, camera );
-
-        if( video.readyState === video.HAVE_ENOUGH_DATA ){
-            if (texture) texture.needsUpdate = true;
-            imageContext.drawImage( video, 0, 0 );
-
-        }
-
-			}
+}
 
 
