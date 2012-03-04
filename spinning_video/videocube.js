@@ -37,7 +37,7 @@ function init() {
 	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.x = 0;
 	camera.position.y = 0;
-	camera.position.z = 450;
+	camera.position.z = 900;
 	scene.add( camera );
 
 	// Cube, which plays a video (open format video files only - not sure if vimeo will be possible)
@@ -67,7 +67,7 @@ function init() {
 	texture.minFilter = THREE.LinearFilter;
 	texture.magFilter = THREE.LinearFilter;
 
-  var parameters = { color: 0x000000, map: texture, overdraw: true },
+  var parameters = { color: 0xffffff, map: texture,  overdraw: true},
 	material_base = new THREE.MeshBasicMaterial( parameters );
   material = new THREE.MeshBasicMaterial(parameters);
 
@@ -75,17 +75,22 @@ function init() {
 		materials.push( material );   
 	}
 
-	surface = new THREE.Mesh( new THREE.CubeGeometry( 637, 264, 637, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+/* 	surface = new THREE.Mesh( new THREE.CubeGeometry( 637, 264, 637, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() ); */
+// radius <Number>, segmentsWidth <Number>, segmentsHeight <Number>
+	surface = new THREE.Mesh( new THREE.SphereGeometry( 300, 50, 50 ), material);
+
 	scene.add( surface );
 
 //( radiusTop <Number>, radiusBottom <Number>, height <Number>, segmentsRadius <Number>, segmentsHeight <Number>, openEnded <Boolean> )
 
+/*  radiusTop <Number>, radiusBottom <Number>, height <Number>, segmentsRadius <Number>, segmentsHeight <Number>, openEnded <Boolean>  */
+
 /*
-  surface = new THREE.Mesh( new THREE.CylinderGeometry(), new THREE.MeshFaceMaterial() );
+  surface = new THREE.Mesh( new THREE.CylinderGeometry(200, 200, 200), material;
 	scene.add( surface );
 	
-*/
 	
+*/
 
 	// Plane
 	plane = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ), new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
@@ -181,8 +186,9 @@ function animate() {
 }
 
 function render() {
+	surface.rotation.x += ( targetRotation - surface.rotation.x ) * 0.05;
+	surface.rotation.y += ( targetRotation - surface.rotation.y ) * 0.05;
 
-	plane.rotation.z = surface.rotation.y += ( targetRotation - surface.rotation.y ) * 0.05;
 	renderer.render( scene, camera );
 
   if( video.readyState === video.HAVE_ENOUGH_DATA ){
