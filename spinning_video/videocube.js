@@ -34,10 +34,10 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.x = 0;
 	camera.position.y = 0;
-	camera.position.z = 500;
+	camera.position.z = 450;
 	scene.add( camera );
 
 	// Cube, which plays a video (open format video files only - not sure if vimeo will be possible)
@@ -79,7 +79,7 @@ function init() {
 	scene.add( cube );
 
 	// Plane
-	plane = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+	plane = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ), new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 	plane.rotation.x = - 90 * ( Math.PI / 180 );
 	plane.position.y = -100;
 	scene.add( plane );
