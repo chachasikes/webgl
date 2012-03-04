@@ -1,6 +1,6 @@
 var container, stats;
 var camera, scene, renderer;
-var cube, plane;
+var surface, plane;
 
 var targetRotation = 0;
 var targetRotationOnMouseDown = 0;
@@ -75,8 +75,17 @@ function init() {
 		materials.push( material );   
 	}
 
-	cube = new THREE.Mesh( new THREE.CubeGeometry( 637, 264, 637, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
-	scene.add( cube );
+	surface = new THREE.Mesh( new THREE.CubeGeometry( 637, 264, 637, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+	scene.add( surface );
+
+//( radiusTop <Number>, radiusBottom <Number>, height <Number>, segmentsRadius <Number>, segmentsHeight <Number>, openEnded <Boolean> )
+
+/*
+  surface = new THREE.Mesh( new THREE.CylinderGeometry(), new THREE.MeshFaceMaterial() );
+	scene.add( surface );
+	
+*/
+	
 
 	// Plane
 	plane = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ), new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
@@ -173,7 +182,7 @@ function animate() {
 
 function render() {
 
-	plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
+	plane.rotation.z = surface.rotation.y += ( targetRotation - surface.rotation.y ) * 0.05;
 	renderer.render( scene, camera );
 
   if( video.readyState === video.HAVE_ENOUGH_DATA ){
