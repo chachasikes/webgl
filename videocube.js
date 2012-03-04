@@ -18,6 +18,7 @@
 
       var videoTexture;
       var material;
+      var imageContext;
 
 			init();
 			animate();
@@ -48,34 +49,55 @@
 				// Cube
 
 				var materials = [];
-
-
-
         video = document.createElement('video');
         video.width = 320;
-        video.height    = 240;
-        video.autoplay  = true;
+        video.height = 240;
+        video.autoplay = true;
         video.src = "http://erunways.com/html5/WebM_VP8_video/html5_Video_VP8.webm";
-        videoTexture = new THREE.Texture( video );
-        
-        videoTexture.minFilter = THREE.LinearFilter;
-			   videoTexture.magFilter = THREE.LinearFilter;
-				videoTexture.format = THREE.RGBFormat;
-        
-        material    = new THREE.MeshLambertMaterial({
-          map : videoTexture, 
-         color: 0xffffff
-        });
-        if( video.readyState === video.HAVE_ENOUGH_DATA ){
-            videoTexture.needsUpdate = true;
-        }
        // container.appendChild(video);
+        
+        videoTexture = new THREE.Texture( video );
+        videoTexture.minFilter = THREE.LinearFilter;
+			  videoTexture.magFilter = THREE.LinearFilter;
+				videoTexture.format = THREE.RGBFormat;  
+
+        image = document.createElement( 'canvas' );
+				image.width = 480;
+				image.height = 204;
+				
+				imageContext = image.getContext( '2d' );
+				imageContext.fillStyle = '#0ffb00';
+				imageContext.fillRect( 0, 0, 480, 204 );
+				
+				texture = new THREE.Texture( image );
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+
+			  var parameters = { color: 0xffffff, map: texture },
+				material_base = new THREE.MeshBasicMaterial( parameters );
+
+
+				
+			//		var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+
+        material = new THREE.MeshBasicMaterial(parameters);
+        //texture
+//THREE.ImageUtils.loadTexture("texture.png")
+/*
+        material = new THREE.MeshLambertMaterial({
+          map : videoTexture, 
+          color: 0xffaabb
+        });
+*/
+
+
 
 				for ( var i = 0; i < 6; i ++ ) {
-					materials.push( material);   
+					materials.push( material );   
 				}
 
 				cube = new THREE.Mesh( new THREE.CubeGeometry( 400, 200, 300, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+        cube.overdraw = true;
 
 				cube.position.y = 150;
 				scene.add( cube );
@@ -177,7 +199,9 @@
 				renderer.render( scene, camera );
 
         if( video.readyState === video.HAVE_ENOUGH_DATA ){
-            if (videoTexture) videoTexture.needsUpdate = true;
+            if (texture) texture.needsUpdate = true;
+            imageContext.drawImage( video, 0, 0 );
+
         }
 
 			}
