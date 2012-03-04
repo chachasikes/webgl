@@ -1,3 +1,5 @@
+// based off of http://mrdoob.github.com/three.js/examples/canvas_geometry_cube.html
+
 var container, stats;
 var camera, scene, renderer;
 var surface, plane;
